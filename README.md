@@ -43,7 +43,7 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 Describe any challenges encountered while building the app.
 Had an initial issue with the app crashing when the Now Playing endpoint wasn't updated completely with all the data, e.g. no title image. Fixed it with optionals.
 
-I created this seperate xcode project from the actual project I'm working on (which is ahead of the schedule) as I'm not sure what specifically is being checked.
+Spent some time looking into the details of how each piece of code functions.
 
 ## License
 
