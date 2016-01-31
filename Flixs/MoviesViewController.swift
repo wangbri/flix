@@ -54,7 +54,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         // Initialize a UIRefreshControl
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: "refreshControlAction:", forControlEvents: UIControlEvents.ValueChanged)
-        collectionView.insertSubview(refreshControl, atIndex: 0)
+        collectionView.insertSubview(refreshControl, atIndex: 35)
         
         flowLayout.scrollDirection = .Vertical
         flowLayout.minimumLineSpacing = 0
@@ -71,19 +71,29 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         self.networkErrorLabel.frame = networkErrorLabelFrame
 
         // Do any additional setup after loading the view.
-        self.view.bringSubviewToFront(networkErrorLabel);
+        //self.view.bringSubviewToFront(networkErrorLabel);
         self.view.bringSubviewToFront(searchBar);
         
         
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
         view.addGestureRecognizer(tap)
         
+        networkErrorLabel.userInteractionEnabled = true
+        let gestureRecognizer = UITapGestureRecognizer(target: self, action: Selector("labelPressed"))
+        networkErrorLabel.addGestureRecognizer(gestureRecognizer)
+        
         
        //not working atm
-        let panRecognizer = UIPanGestureRecognizer(target: self, action: Selector("panedView:"))
-        self.view.addGestureRecognizer(panRecognizer)
+        /*let panRecognizer = UIPanGestureRecognizer(target: self, action: Selector("panedView:"))
+        self.view.addGestureRecognizer(panRecognizer)*/
         
         //filteredData = movieTitles
+    }
+    
+    func labelPressed(){
+        print("Label pressed")
+        loadDataFromNetwork()
+
     }
     
     /*func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
@@ -165,7 +175,8 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
     
     
     //not working atm
-    func panedView(sender: UIPanGestureRecognizer) {
+    //only seems to work when network error
+    /*func panedView(sender: UIPanGestureRecognizer) {
         if (sender.state == UIGestureRecognizerState.Began) {
             startLocation = sender.locationInView(self.view);
         }
@@ -182,7 +193,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
             }
             
         }
-    }
+    }*/
     
     
     //Calls this function when the tap is recognized.
@@ -200,6 +211,8 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
     // Updates the tableView with the new data
     // Hides the RefreshControl
     func refreshControlAction(refreshControl: UIRefreshControl) {
+        
+        
         
         //self.searchBar.alpha = 0
         
@@ -232,10 +245,10 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
                 
                 if let _ = error {
                     //self.networkErrorLabel.hidden = false
-                    
+                    self.view.bringSubviewToFront(self.networkErrorLabel);
                     UIView.animateWithDuration(0.5, animations: {
                         var networkErrorLabelFrame = self.networkErrorLabel.frame
-                        networkErrorLabelFrame.origin.y = -44
+                        networkErrorLabelFrame.origin.y = 0
                         self.networkErrorLabel.frame = networkErrorLabelFrame
                         self.networkErrorLabel.alpha = 1
                         
@@ -245,6 +258,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
                         self.searchBar.alpha = 1*/
                     })
                 } else {
+                    
                     UIView.animateWithDuration(0.5, animations: {
                         var networkErrorLabelFrame = self.networkErrorLabel.frame
                         networkErrorLabelFrame.origin.y = -69
@@ -266,6 +280,41 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
                             self.movies = responseDictionary["results"] as? [NSDictionary]
                             self.collectionView.reloadData()
                             
+                            //var movieTitles = [AnyObject]()
+                            
+                            //to get data (titles) into array
+                            
+                            
+                            self.movieTitles.removeAll()
+                            self.moviePosters.removeAll()
+                            self.filteredTitles.removeAll()
+                            self.filteredPosters.removeAll()
+                            
+                            self.data.removeAll()
+                            self.filteredData.removeAll()
+                            
+                            
+                            
+                            
+                            for movie: NSDictionary in (responseDictionary["results"] as! [NSDictionary]){
+                                
+                                self.movieTitles.append(movie["title"]! as! String)
+                                self.moviePosters.append(movie["poster_path"]! as! String)
+                            }
+                            
+                            for (index, element) in self.movieTitles.enumerate()
+                            {
+                                self.data[element] = self.moviePosters[index]
+                            }
+                            
+                            self.filteredTitles = self.movieTitles
+                            self.filteredPosters = self.moviePosters
+                            
+                            for (index, element) in self.filteredTitles.enumerate()
+                            {
+                                self.filteredData[element] = self.filteredPosters[index]
+                            }
+                            self.collectionView.reloadData()
                     }
                 }
                 
@@ -309,12 +358,25 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
                 
                 if let _ = error {
                     //self.networkErrorLabel.hidden = false
-                   
+                    self.view.bringSubviewToFront(self.networkErrorLabel);
                     UIView.animateWithDuration(0.5, animations: {
                     var networkErrorLabelFrame = self.networkErrorLabel.frame
                     networkErrorLabelFrame.origin.y = 0
                     self.networkErrorLabel.frame = networkErrorLabelFrame
                     self.networkErrorLabel.alpha = 1
+                    })
+                } else {
+                    
+                    UIView.animateWithDuration(0.5, animations: {
+                        var networkErrorLabelFrame = self.networkErrorLabel.frame
+                        networkErrorLabelFrame.origin.y = -69
+                        self.networkErrorLabel.frame = networkErrorLabelFrame
+                        self.networkErrorLabel.alpha = 0
+                        
+                        /*var searchBarFrame = self.searchBar.frame
+                        searchBarFrame.origin.y = 0
+                        self.searchBar.frame = searchBarFrame
+                        self.searchBar.alpha = 1*/
                     })
                 }
                 
@@ -327,6 +389,14 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
                             self.collectionView.reloadData()
                             
                             //var movieTitles = [AnyObject]()
+                            
+                            self.movieTitles.removeAll()
+                            self.moviePosters.removeAll()
+                            self.filteredTitles.removeAll()
+                            self.filteredPosters.removeAll()
+                            
+                            self.data.removeAll()
+                            self.filteredData.removeAll()
                             
                             //to get data (titles) into array
                             for movie: NSDictionary in (responseDictionary["results"] as! [NSDictionary]){
@@ -411,10 +481,32 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         }
         
         if(searchActive){
+            
                 let posterPath = self.filteredData[filteredTitles[indexPath.row]]! as String
                 let posterBaseUrl = "http://image.tmdb.org/t/p/w500"
                 let posterUrl = NSURL(string: posterBaseUrl + posterPath)
-                cell.posterView.setImageWithURL(posterUrl!)
+                let imageRequest = NSURLRequest(URL: posterUrl!)
+                cell.posterView.setImageWithURLRequest(
+                imageRequest,
+                placeholderImage: nil,
+                success: { (imageRequest, imageResponse, image) -> Void in
+                    
+                    // imageResponse will be nil if the image is cached
+                    if imageResponse != nil {
+                        print("Image was NOT cached, fade in image")
+                        cell.posterView.alpha = 0.0
+                        cell.posterView.image = image
+                        UIView.animateWithDuration(0.3, animations: { () -> Void in
+                            cell.posterView.alpha = 1.0
+                        })
+                    } else {
+                        print("Image was cached so just update the image")
+                        cell.posterView.image = image
+                    }
+                },
+                failure: { (imageRequest, imageResponse, error) -> Void in
+                    // do something for the failure condition
+            })
                 
             /*else {
                 // No poster image. Can either set to nil (no image) or a default movie poster image
@@ -424,7 +516,34 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
             //cell.posterView
         } else {
             let movie = movies![indexPath.row]
-            if let posterPath = movie["poster_path"] as? String {
+            let posterPath = movie["poster_path"] as? String
+            let posterBaseUrl = "http://image.tmdb.org/t/p/w500"
+            let posterUrl = NSURL(string: posterBaseUrl + posterPath!)
+            let imageRequest = NSURLRequest(URL: posterUrl!)
+            cell.posterView.setImageWithURLRequest(
+                imageRequest,
+                placeholderImage: nil,
+                success: { (imageRequest, imageResponse, image) -> Void in
+                    
+                    // imageResponse will be nil if the image is cached
+                    if imageResponse != nil {
+                        print("Image was NOT cached, fade in image")
+                        cell.posterView.alpha = 0.0
+                        cell.posterView.image = image
+                        UIView.animateWithDuration(0.3, animations: { () -> Void in
+                            cell.posterView.alpha = 1.0
+                        })
+                    } else {
+                        print("Image was cached so just update the image")
+                        cell.posterView.image = image
+                    }
+                },
+                failure: { (imageRequest, imageResponse, error) -> Void in
+                    cell.posterView.image = nil
+                    print("IMAGES EMPTY")
+                    // do something for the failure condition
+            })
+            /*if let posterPath = movie["poster_path"] as? String {
                 let posterBaseUrl = "http://image.tmdb.org/t/p/w500"
                 let posterUrl = NSURL(string: posterBaseUrl + posterPath)
                 cell.posterView.setImageWithURL(posterUrl!)
@@ -434,7 +553,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
                 cell.posterView.image = nil
                 print("ALSO EMPTY")
             }
-            print("no text, \(movieTitles.count)")
+            print("no text, \(movieTitles.count)")*/
         }
         
         //MAKE SEARCH INACTIVE UPON TAP/DISMISS KEYBOARD
