@@ -2,7 +2,7 @@
 
 flix is a movies app using the [The Movie Database API](http://docs.themoviedb.apiary.io/#).
 
-Time spent: 13 hours spent in total
+Time spent: 10 hours spent in total
 
 ## User Stories
 
@@ -30,13 +30,13 @@ The following **additional** features are implemented:
 Please list two areas of the assignment you'd like to **discuss further with your peers** during the next class (examples include better ways to implement something, how to extend your app in certain ways, etc):
 
 1. better and more efficient methods of improving animation sequences 
-2. where additional optionals should be included for subsets/elements in the movie dictioanry to prevent crashing
+2. where additional optionals should be included for subsets/elements in the movie dictionary to prevent crashing
 
 ## Video Walkthrough 
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/m1v00sV.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='http://i.imgur.com/uahIr6D.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
@@ -44,6 +44,7 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 Describe any challenges encountered while building the app.
 
+I spent an unnecessarily long time fixing errors.
 
 ## License
 
