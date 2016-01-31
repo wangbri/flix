@@ -107,29 +107,43 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         self.collectionView.reloadData()
     }*/
     
-    func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
-        searchActive = true;
+    /*func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+        searchActive = true
     }
     
     func searchBarTextDidEndEditing(searchBar: UISearchBar) {
-        searchActive = false;
+        searchActive = true
+        //self.collectionView.reloadData()
     }
     
     func searchBarCancelButtonClicked(searchBar: UISearchBar) {
-        searchActive = false;
+        searchActive = false
     }
     
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
-        searchActive = false;
-    }
+        searchActive = true
+    }*/
     
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
         
-        filteredTitles = movieTitles.filter({ (text) -> Bool in
-            let tmp: NSString = text
-            let range = tmp.rangeOfString(searchText, options: NSStringCompareOptions.CaseInsensitiveSearch)
-            return range.location != NSNotFound
-        })
+        if searchText.isEmpty {
+            searchActive = false
+            self.filteredData = self.data //inconsistent movie order, disappearing
+            self.filteredTitles = self.movieTitles //this fixed the uisearchbar
+            print("EMPTY")
+            print(movies)
+            
+            //self.collectionView.reloadData()
+            print (movieTitles.count)
+            //print(filteredData)
+            //self.collectionView.reloadData()
+       } else {
+            filteredTitles = movieTitles.filter({ (text) -> Bool in
+                let tmp: NSString = text
+                let range = tmp.rangeOfString(searchText, options: NSStringCompareOptions.CaseInsensitiveSearch)
+                return range.location != NSNotFound
+            })
+        }
         /*filteredPosters = moviePosters.filter({ (text) -> Bool in
             let tmp: NSString = text
             let range = tmp.rangeOfString(searchText, options: NSStringCompareOptions.CaseInsensitiveSearch)
@@ -148,6 +162,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         self.collectionView.reloadData()
     }
 
+    
     
     //not working atm
     func panedView(sender: UIPanGestureRecognizer) {
@@ -320,17 +335,17 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
                                 self.moviePosters.append(movie["poster_path"]! as! String)
                             }
                             
-                            for (index, element) in self.moviePosters.enumerate()
+                            for (index, element) in self.movieTitles.enumerate()
                             {
-                                self.data[element] = self.movieTitles[index]
+                                self.data[element] = self.moviePosters[index]
                             }
                             
                             self.filteredTitles = self.movieTitles
                             self.filteredPosters = self.moviePosters
                             
-                            for (index, element) in self.filteredPosters.enumerate()
+                            for (index, element) in self.filteredTitles.enumerate()
                             {
-                                self.filteredData[element] = self.filteredTitles[index]
+                                self.filteredData[element] = self.filteredPosters[index]
                             }
                             
                             print(self.data)
@@ -379,39 +394,50 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
         
+        
+        
         if(searchActive){
             cell.titleLabel?.text = filteredTitles[indexPath.row]
             //cell.posterView
         } else {
-            cell.titleLabel?.text = movieTitles[indexPath.row];
+            let movie = movies![indexPath.row]
+            if let title = movie["title"] as? String{
+                cell.titleLabel.text = title
+            }
+            else {
+                cell.titleLabel.text = nil
+            }
+            //cell.titleLabel?.text = movieTitles[indexPath.row];
         }
         
         if(searchActive){
-            if let posterPath = filteredPosters[indexPath.row] as? String {
+                let posterPath = self.filteredData[filteredTitles[indexPath.row]]! as String
                 let posterBaseUrl = "http://image.tmdb.org/t/p/w500"
                 let posterUrl = NSURL(string: posterBaseUrl + posterPath)
                 cell.posterView.setImageWithURL(posterUrl!)
-            }
-            else {
+                
+            /*else {
                 // No poster image. Can either set to nil (no image) or a default movie poster image
                 // that you include as an asset
                 cell.posterView.image = nil
-            }
+            }*/
             //cell.posterView
         } else {
-            if let posterPath = moviePosters[indexPath.row] as? String {
+            let movie = movies![indexPath.row]
+            if let posterPath = movie["poster_path"] as? String {
                 let posterBaseUrl = "http://image.tmdb.org/t/p/w500"
                 let posterUrl = NSURL(string: posterBaseUrl + posterPath)
                 cell.posterView.setImageWithURL(posterUrl!)
-            }
-            else {
+            } else {
                 // No poster image. Can either set to nil (no image) or a default movie poster image
                 // that you include as an asset
                 cell.posterView.image = nil
+                print("ALSO EMPTY")
             }
+            print("no text, \(movieTitles.count)")
         }
         
-        //let movie = movies![indexPath.row]
+        //MAKE SEARCH INACTIVE UPON TAP/DISMISS KEYBOARD
         
         
         /*if let title = movie["title"] as? String{
