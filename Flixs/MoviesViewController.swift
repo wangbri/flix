@@ -75,8 +75,10 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         self.view.bringSubviewToFront(searchBar);
         
         
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
-        view.addGestureRecognizer(tap)
+        /*let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
+        view.addGestureRecognizer(tap)*/
+        
+        
         
         networkErrorLabel.userInteractionEnabled = true
         let gestureRecognizer = UITapGestureRecognizer(target: self, action: Selector("labelPressed"))
@@ -94,6 +96,11 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         print("Label pressed")
         loadDataFromNetwork()
 
+    }
+    
+    func collectionView(collectionView: UICollectionView,
+        didSelectItemAtIndexPath indexPath: NSIndexPath) {
+            dismissKeyboard()
     }
     
     /*func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
@@ -516,9 +523,9 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
             //cell.posterView
         } else {
             let movie = movies![indexPath.row]
-            let posterPath = movie["poster_path"] as? String
+            if let posterPath = movie["poster_path"] as? String {
             let posterBaseUrl = "http://image.tmdb.org/t/p/w500"
-            let posterUrl = NSURL(string: posterBaseUrl + posterPath!)
+            let posterUrl = NSURL(string: posterBaseUrl + posterPath)
             let imageRequest = NSURLRequest(URL: posterUrl!)
             cell.posterView.setImageWithURLRequest(
                 imageRequest,
@@ -554,6 +561,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
                 print("ALSO EMPTY")
             }
             print("no text, \(movieTitles.count)")*/
+            }
         }
         
         //MAKE SEARCH INACTIVE UPON TAP/DISMISS KEYBOARD
@@ -607,15 +615,25 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
     
     
     
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        let cell = sender as! UICollectionViewCell
+        let indexPath = collectionView.indexPathForCell(cell)
+        let movie = movies![indexPath!.row]
+        
+        let detailViewController = segue.destinationViewController as! DetailViewController
+        detailViewController.movie = movie
+        
+        
+        
+        
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
     }
-    */
+    
     
     
     //NOTES: COMBINE TWO ARRAYS INTO A DICTIONARY TO TIE INDEX ROW VALUES OF TITLES TO POSTERS AND THEN TAKE THE TITLES
