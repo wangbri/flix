@@ -1,6 +1,6 @@
-# Project 1 - flix
+# Project 1 - *flix*
 
-flix is a movies app using the [The Movie Database API](http://docs.themoviedb.apiary.io/#).
+**flix** is a movies app using the [The Movie Database API](http://docs.themoviedb.apiary.io/#).
 
 Time spent: 10 hours spent in total
 
@@ -63,9 +63,9 @@ Computer would max out its CPU usage as well, slowing things down tremendously.
     See the License for the specific language governing permissions and
     limitations under the License.
     
-# Project 2 - *Flix*
+# Project 2 - *flix*
 
-**Flix** is a movies app displaying box office and top rental DVDs using [The Movie Database API](http://docs.themoviedb.apiary.io/#).
+**flix** is a movies app displaying box office and top rental DVDs using [The Movie Database API](http://docs.themoviedb.apiary.io/#).
 
 Time spent: **1/2** hours spent in total
 
