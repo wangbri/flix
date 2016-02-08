@@ -15,6 +15,53 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+        window = UIWindow(frame: UIScreen.mainScreen().bounds)
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        
+        let nowPlayingNavigationController = storyboard.instantiateViewControllerWithIdentifier("MoviesNavigationController") as! UINavigationController
+        
+        let nowPlayingViewController = nowPlayingNavigationController.topViewController as! MoviesViewController
+        
+        nowPlayingViewController.endpoint = "now_playing"
+        
+        nowPlayingNavigationController.tabBarItem.title = "Now Playing"
+        nowPlayingNavigationController.tabBarItem.image = UIImage(named: "nowplaying")
+        
+        let topRatedNavigationController = storyboard.instantiateViewControllerWithIdentifier("MoviesNavigationController") as! UINavigationController
+        
+        let topRatedViewController = topRatedNavigationController.topViewController as! MoviesViewController
+        
+        topRatedViewController.endpoint = "top_rated"
+        
+        topRatedNavigationController.tabBarItem.title = "Top Rated"
+        topRatedNavigationController.tabBarItem.image = UIImage(named: "toprated")
+        
+        let tabBarController = UITabBarController()
+        tabBarController.viewControllers = [nowPlayingNavigationController, topRatedNavigationController]
+        
+        //print("tab bar height \(tabBarController.tabBar.frame.size.height)")
+
+        
+        
+        
+        
+        UITabBar.appearance().barTintColor = UIColor(red: 255.0/255.0, green: 222.0/255.0, blue: 120.0/255.0, alpha: 0.84)
+        
+        UITabBar.appearance().translucent = false
+        
+        UITabBar.appearance().tintColor = UIColor.whiteColor()
+        //UITabBar.appearance().barTintColor = UIColor.blackColor()
+        //UITabBar.appearance().backgroundImage = UIImage()
+        //UITabBar.appearance().shadowImage = UIImage()
+        
+        
+
+        
+        window?.rootViewController = tabBarController
+        window?.makeKeyAndVisible()
+        
+        
         // Override point for customization after application launch.
         return true
     }

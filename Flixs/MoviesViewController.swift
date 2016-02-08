@@ -11,7 +11,7 @@ import AFNetworking
 import MBProgressHUD
 
 class MoviesViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UISearchBarDelegate {//UITableViewDataSource, UITableViewDelegate {
-
+    
     @IBOutlet weak var networkErrorLabel: UILabel!
 
     @IBOutlet weak var searchBar: UISearchBar!
@@ -40,10 +40,22 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
     
     var searchActive : Bool = false
     
+    var endpoint: String = "now_playing"
+    
+    //var movieCell: MovieCell?
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        
+        
+        
+        //self.collectionView.frame = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, (self.view.frame.size.height - self.tabBarController!.tabBar.frame.size.height))
+        
+        //let contentWidth = UIScrollView.bounds.width
+        //let contentHeight = UIScrollView.bounds.height * 3
+        //UIScrollView.contentSize = CGSizeMake(collectionView.frame.size.width, collectionView.frame.size.height)
         
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -62,6 +74,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         flowLayout.sectionInset = UIEdgeInsetsMake(0, 0, 0, 0)
 
         
+        //navigationBar.barStyle = UIBarStyle.Black
         
         //task.resume()
         //self.networkErrorLabel.hidden = true
@@ -90,6 +103,16 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         self.view.addGestureRecognizer(panRecognizer)*/
         
         //filteredData = movieTitles
+        
+        navigationItem.titleView = searchBar
+    }
+    
+    override func viewDidLayoutSubviews() {
+        self.collectionView.contentInset = UIEdgeInsetsMake(0, 0, 2.32*self.tabBarController!.tabBar.frame.size.height, 0)
+        
+        print("bottomLayout height \(self.bottomLayoutGuide.length)")
+        
+        print("tab bar height \(self.tabBarController!.tabBar.frame.size.height)")
     }
     
     func labelPressed(){
@@ -101,6 +124,8 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
     func collectionView(collectionView: UICollectionView,
         didSelectItemAtIndexPath indexPath: NSIndexPath) {
             dismissKeyboard()
+            //self.movieCell!.posterView.alpha = 0.50
+            
     }
     
     /*func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
@@ -233,7 +258,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         )
         
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
-        let url = NSURL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+        let url = NSURL(string: "https://api.themoviedb.org/3/movie/\(endpoint)?api_key=\(apiKey)")
         let request = NSURLRequest(
             URL: url!,
             cachePolicy: NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData,
@@ -336,7 +361,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         // ... Create the NSURLRequest (myRequest) ...
         
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
-        let url = NSURL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+        let url = NSURL(string: "https://api.themoviedb.org/3/movie/\(endpoint)?api_key=\(apiKey)")
         let request = NSURLRequest(
             URL: url!,
             cachePolicy: NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData,
@@ -427,6 +452,8 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
                             
                             print(self.data)
                             
+                            
+                            
                     }
                 }
         })
@@ -471,7 +498,18 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
         
+        //movieCell = cell
+        /*let backgroundView = UIView()
+        backgroundView.backgroundColor = UIColor.blueColor()
+        cell.selectedBackgroundView = backgroundView*/
         
+                
+        //cell.selectionStyle = .None
+        
+        
+        /*_ = UIView()
+        backgroundView.backgroundColor = UIColor.redColor()
+        cell.selectedBackgroundView = backgroundView*/
         
         if(searchActive){
             cell.titleLabel?.text = filteredTitles[indexPath.row]
@@ -490,25 +528,48 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         if(searchActive){
             
                 let posterPath = self.filteredData[filteredTitles[indexPath.row]]! as String
-                let posterBaseUrl = "http://image.tmdb.org/t/p/w500"
-                let posterUrl = NSURL(string: posterBaseUrl + posterPath)
-                let imageRequest = NSURLRequest(URL: posterUrl!)
+                let posterBaseUrl = "https://image.tmdb.org/t/p/w45"
+                let largePosterBaseUrl = "https://image.tmdb.org/t/p/original"
+                let smallPosterUrl = NSURL(string: posterBaseUrl + posterPath)
+                let largePosterUrl = NSURL(string: largePosterBaseUrl + posterPath)
+                //let imageRequest = NSURLRequest(URL: posterUrl!)
+                let smallImageRequest = NSURLRequest(URL: smallPosterUrl!)
+                let largeImageRequest = NSURLRequest(URL: largePosterUrl!)
                 cell.posterView.setImageWithURLRequest(
-                imageRequest,
+                smallImageRequest,
                 placeholderImage: nil,
-                success: { (imageRequest, imageResponse, image) -> Void in
+                success: { (smallImageRequest, smallImageResponse, smallImage) -> Void in
+                    
+                    var cacheImage: UIImage?
                     
                     // imageResponse will be nil if the image is cached
-                    if imageResponse != nil {
+                    if smallImageResponse != nil {
                         print("Image was NOT cached, fade in image")
                         cell.posterView.alpha = 0.0
-                        cell.posterView.image = image
+                        cell.posterView.image = smallImage
                         UIView.animateWithDuration(0.3, animations: { () -> Void in
                             cell.posterView.alpha = 1.0
+                            }, completion: { (sucess) -> Void in
+                                
+                                // The AFNetworking ImageView Category only allows one request to be sent at a time
+                                // per ImageView. This code must be in the completion block.
+                                cell.posterView.setImageWithURLRequest(
+                                    largeImageRequest,
+                                    placeholderImage: smallImage,
+                                    success: { (largeImageRequest, largeImageResponse, largeImage) -> Void in
+                                        
+                                        cell.posterView.image = largeImage;
+                                        cacheImage = largeImage
+                                        
+                                    },
+                                    failure: { (request, response, error) -> Void in
+                                        // do something for the failure condition of the large image request
+                                        // possibly setting the ImageView's image to a default image
+                                })
                         })
                     } else {
                         print("Image was cached so just update the image")
-                        cell.posterView.image = image
+                        cell.posterView.image = cacheImage
                     }
                 },
                 failure: { (imageRequest, imageResponse, error) -> Void in
@@ -626,8 +687,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         
         let detailViewController = segue.destinationViewController as! DetailViewController
         detailViewController.movie = movie
-        
-        
+
         
         
         // Get the new view controller using segue.destinationViewController.
